@@ -1,1 +1,7 @@
 Design
+
+
+Backend/node_modules/
+Backend/.env
+Backend/dist/
+Backend/src/generated/prisma

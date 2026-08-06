@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SpaceType {
+  dm
+  group
+}
+
+enum SpaceRole {
+  member
+  admin
+}
+
+enum FriendStatus {
+  pending
+  accepted
+  blocked
+}
+
+model User {
+  userId     Int      @id
+  email      String   @unique
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  profile Profile?
+}
+
+model Profile {
+  id     Int @id @default(autoincrement())
+  userId Int @unique
+
+  username    String  @unique
+  displayName String
+  avatarUrl   String?
+  bio         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  createdSpaces Space[]       @relation("CreatedSpaces")
+  memberships   SpaceMember[]
+  sentMessages  Message[]     @relation("Sender")
+
+  friendships1 Friend[] @relation("FriendOne")
+  friendships2 Friend[] @relation("FriendTwo")
+}
+
+model Space {
+  id   Int       @id @default(autoincrement())
+  name String
+  type SpaceType
+
+  createdById Int
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastMessageAt DateTime?
+
+  creator Profile @relation("CreatedSpaces", fields: [createdById], references: [id])
+
+  members  SpaceMember[]
+  messages Message[]
+
+  @@index([createdById])
+}
+
+model SpaceMember {
+  spaceId   Int
+  profileId Int
+
+  joinedAt DateTime  @default(now())
+  role     SpaceRole @default(member)
+
+  space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([spaceId, profileId])
+  @@index([profileId])
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+
+  spaceId  Int
+  senderId Int
+
+  content String
+
+  createdAt DateTime  @default(now())
+  editedAt  DateTime?
+  deletedAt DateTime?
+
+  space  Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  sender Profile @relation("Sender", fields: [senderId], references: [id])
+
+  @@index([spaceId, createdAt])
+  @@index([senderId])
+}
+
+model Friend {
+  profile1Id Int
+  profile2Id Int
+
+  status FriendStatus @default(pending)
+
+  createdAt DateTime @default(now())
+
+  profile1 Profile @relation("FriendOne", fields: [profile1Id], references: [id], onDelete: Cascade)
+  profile2 Profile @relation("FriendTwo", fields: [profile2Id], references: [id], onDelete: Cascade)
+
+  @@id([profile1Id, profile2Id])
+  @@index([status])
+}

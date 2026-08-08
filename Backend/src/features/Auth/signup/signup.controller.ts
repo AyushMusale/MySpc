@@ -3,20 +3,12 @@ import type { Request, Response } from "express";
 import { prisma } from "../../../lib/prisma.js";
 import { generateTokens } from "../../../services/tokens.service.js";
 import { generateUniqueCode } from "../../../utils/generateUUID.js";
-import { signupSchema } from "../auth.validator.js";
+import { type SignupRequest } from "../auth.validator.js";
 
-export const signupController = async (req: Request, res: Response) => {
+export const signupController = async (req: SignupRequest, res: Response) => {
   try {
-    // 1. Validate the data
-    const parsed = signupSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({
-        success: false,
-        message: parsed.error.issues[0]?.message || "Invalid input",
-      });
-    }
-
-    const { email, displayName, username, avatarUrl } = parsed.data;
+    // 1. Validated data
+    const { email, displayName, username, avatarUrl } = req.parsedData!;
 
     // 2. Check if user already exists using email
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -54,7 +46,33 @@ export const signupController = async (req: Request, res: Response) => {
     // 6. Generate tokens
     const { accessToken, refreshToken } = generateTokens({ userId: user.userId, email: user.email });
 
-    // 7. Respond
+    // 7. Respond — cookies (httpOnly) for web, tokens in body for mobile.
+    // Web never gets raw tokens in the response body: if an XSS bug ever
+    // let injected JS read localStorage, httpOnly cookies stay out of reach
+    // (document.cookie can't see httpOnly cookies either). Mobile has no
+    // cookie jar, so it needs the tokens directly to persist in secure
+    // storage (Keychain / Keystore).
+    const clientType = req.headers["x-client-type"];
+
+    if (clientType === "web") {
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+
+      return res.status(201).json({
+        success: true,
+        profile,
+      });
+    }
+
+    // Mobile (or unspecified client type — treat as mobile/non-browser default)
     return res.status(201).json({
       success: true,
       profile,

@@ -25,15 +25,15 @@ export const sendOtpController = async (req: Request, res: Response) => {
 
     const { email } = parsed.data;
 
-    // 2. Check if user exists — this is signin, so no account means nothing to send OTP for
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    // // 2. Check if user exists — this is signin, so no account means nothing to send OTP for
+    // const existingUser = await prisma.user.findUnique({ where: { email } });
 
-    if (!existingUser) {
-      return res.status(404).json({
-        success: false,
-        msg: "user does not exists",
-      });
-    }
+    // if (!existingUser) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     msg: "user does not exists",
+    //   });
+    // }
 
     // 3. Generate OTP
     const otp = generateOtp(6);
@@ -42,7 +42,7 @@ export const sendOtpController = async (req: Request, res: Response) => {
     await saveOtp(email, otp);
 
     // 5. Send OTP via Resend
-    await sendOtpEmail(email, otp);
+    await sendOtpEmail("aayushmusale05@gmail.com", otp);
 
     // 6. Respond
     return res.status(200).json({

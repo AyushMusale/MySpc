@@ -104,7 +104,31 @@ export const verifyOtpController = async (req: Request, res: Response) => {
       email: user.email,
     });
 
-    // 6. Respond
+    // 6. Respond — cookies (httpOnly) for web, tokens in body for mobile.
+    // Same rationale as signup: web never gets raw tokens in the JSON body
+    // (protects against XSS reading localStorage), mobile has no cookie
+    // jar so it needs the tokens directly to store in Keychain/Keystore.
+    const clientType = req.headers["x-client-type"];
+
+    if (clientType === "web") {
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+
+      return res.status(200).json({
+        success: true,
+        profile: user.profile,
+      });
+    }
+
+    // Mobile
     return res.status(200).json({
       success: true,
       profile: user.profile,

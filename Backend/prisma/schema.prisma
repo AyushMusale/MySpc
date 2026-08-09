@@ -33,8 +33,7 @@ model User {
 }
 
 model Profile {
-  id     Int @id @default(autoincrement())
-  userId Int @unique
+  userId Int @id @unique
 
   username    String  @unique
   displayName String
@@ -65,7 +64,7 @@ model Space {
   updatedAt     DateTime  @updatedAt
   lastMessageAt DateTime?
 
-  creator Profile @relation("CreatedSpaces", fields: [createdById], references: [id])
+  creator Profile @relation("CreatedSpaces", fields: [createdById], references: [userId])
 
   members  SpaceMember[]
   messages Message[]
@@ -81,7 +80,7 @@ model SpaceMember {
   role     SpaceRole @default(member)
 
   space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [userId], onDelete: Cascade)
 
   @@id([spaceId, profileId])
   @@index([profileId])
@@ -100,7 +99,7 @@ model Message {
   deletedAt DateTime?
 
   space  Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  sender Profile @relation("Sender", fields: [senderId], references: [id])
+  sender Profile @relation("Sender", fields: [senderId], references: [userId])
 
   @@index([spaceId, createdAt])
   @@index([senderId])
@@ -114,8 +113,8 @@ model Friend {
 
   createdAt DateTime @default(now())
 
-  profile1 Profile @relation("FriendOne", fields: [profile1Id], references: [id], onDelete: Cascade)
-  profile2 Profile @relation("FriendTwo", fields: [profile2Id], references: [id], onDelete: Cascade)
+  profile1 Profile @relation("FriendOne", fields: [profile1Id], references: [userId], onDelete: Cascade)
+  profile2 Profile @relation("FriendTwo", fields: [profile2Id], references: [userId], onDelete: Cascade)
 
   @@id([profile1Id, profile2Id])
   @@index([status])

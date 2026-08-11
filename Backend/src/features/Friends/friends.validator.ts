@@ -13,6 +13,14 @@ export const sendFriendRequestSchema = z.object({
   receiverId: z.number().int().positive(),
 });
 
+export const respondToFriendRequestSchema = z.object({
+  id: z.number().int().positive(), // profile1Id — the original sender's userId
+  action: z.enum(["accepted", "blocked"]),
+});
+
+export type RespondToFriendRequestInput = z.infer<
+  typeof respondToFriendRequestSchema
+>;
 export type SendFriendRequestInput = z.infer<typeof sendFriendRequestSchema>;
 
 export type FriendSearchInput = z.infer<typeof friendSearchSchema>;

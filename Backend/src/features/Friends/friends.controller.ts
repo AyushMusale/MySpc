@@ -5,7 +5,9 @@ import { FriendStatus, Prisma } from "../../generated/prisma/client.js";
 import type { AuthenticatedRequest } from "../Auth/auth.middleware.js";
 import {
   friendSearchSchema,
+  respondToFriendRequestSchema,
   sendFriendRequestSchema,
+  type RespondToFriendRequestInput,
 } from "./friends.validator.js";
 import { levenshteinDistance } from "../../utils/levenstein.js";
 import { friendService } from "../../services/friends.service.js";
@@ -19,6 +21,11 @@ interface UsernameCandidate {
   username: string;
   userId: number;
   sim: number;
+}
+
+interface RespondToFriendRequestRequest extends Request {
+  parsedData: RespondToFriendRequestInput;
+  user: { userId: number };
 }
 
 export const searchFriendsController = async (
@@ -103,7 +110,7 @@ export const sendFriendRequestController = async (
     return res.status(400).json({
       success: false,
       msg: "invalid request body",
-      errors: parsed.error.flatten(),
+      errors: parsed.error.issues[0]?.message,
     });
   }
 
@@ -166,4 +173,74 @@ export const sendFriendRequestController = async (
       .status(500)
       .json({ success: false, msg: "internal server error" });
   }
+};
+
+export const viewFriendRequests = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const userId = req.user!.userId; // set by auth middleware
+
+    const userExists = await friendService.profileExists(userId);
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const requests = await friendService.getPendingFriendRequests(userId);
+
+    return res.status(200).json(requests);
+  } catch (err) {
+    console.error("Error in viewFriendRequests:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const respondToFriendRequest = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  const parsed = respondToFriendRequestSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({
+      success: false,
+      msg: "invalid request body",
+      errors: parsed.error.issues[0]?.message,
+    });
+  }
+
+  const { id: senderId, action } = parsed.data!;
+  const receiverId = req.user!.userId;
+
+  // Guard: can't respond to a "request" from yourself
+  if (senderId === receiverId) {
+    return res.status(400).json({ error: "Invalid request" });
+  }
+
+  // Guard: a pending request from senderId -> receiverId must exist
+  const friendship = await friendService.getFriendshipByIds(
+    senderId,
+    receiverId,
+  );
+  if (!friendship) {
+    return res
+      .status(404)
+      .json({ error: "No pending friend request from this user" });
+  }
+
+  // Guard: request must still be pending
+  if (friendship.status !== "pending") {
+    return res
+      .status(409)
+      .json({ error: `Friend request is already ${friendship.status}` });
+  }
+
+  const updated = await friendService.updateFriendshipStatus(
+    senderId,
+    receiverId,
+    action,
+  );
+
+  return res.status(200).json({ friendship: updated });
 };

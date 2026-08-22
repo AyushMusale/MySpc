@@ -39,7 +39,7 @@ model Profile {
   displayName String
   avatarUrl   String?
   bio         String?
-
+  isOnline    Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -7,5 +7,4 @@ export const rootRouter = express.Router()
 
 
 rootRouter.use('/auth', authRouter);
-rootRouter.use('/auth/test', authMiddleware);
-rootRouter.use('/friends', friendsRouter);
+rootRouter.use('/friends', authMiddleware, friendsRouter);

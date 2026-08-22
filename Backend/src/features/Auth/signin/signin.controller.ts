@@ -12,6 +12,8 @@ import { generateTokens } from "../../../services/tokens.service.js";
 import { prisma } from "../../../lib/prisma.js";
 
 export const sendOtpController = async (req: Request, res: Response) => {
+
+  
   try {
     // 1. Validate the incoming string is a valid email
     const parsed = sendOtpSchema.safeParse(req.body);
@@ -59,6 +61,7 @@ export const sendOtpController = async (req: Request, res: Response) => {
 };
 
 export const verifyOtpController = async (req: Request, res: Response) => {
+  console.log('verify controller-hit')
   try {
     // 1. Validate the incoming { otp, email }
     const parsed = verifyOtpSchema.safeParse(req.body);

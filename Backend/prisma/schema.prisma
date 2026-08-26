@@ -64,11 +64,11 @@ model Profile {
 }
 
 model Space {
-  id   Int       @id @default(autoincrement())
-  name String?
+  id     Int       @id @default(autoincrement())
+  name   String?
   avatar String?
-  bio String?
-  type SpaceType
+  bio    String?
+  type   SpaceType
 
   createdById Int
 
@@ -97,17 +97,18 @@ model SpaceMember {
   @@id([spaceId, profileId])
   @@index([profileId])
 }
+
 model Message {
-  id        Int         @id @default(autoincrement())
-  spaceId   Int
-  senderId  Int
-  type      MessageType
+  id       Int         @id @default(autoincrement())
+  spaceId  Int
+  senderId Int
+  type     MessageType
 
-  content   String?     // text, caption, etc.
-  mediaUrl  String?     // Cloudinary/S3/etc.
-  thumbnailUrl String?  // useful for video
+  content      String? // text, caption, etc.
+  mediaUrl     String? // Cloudinary/S3/etc.
+  thumbnailUrl String? // useful for video
 
-  createdAt DateTime    @default(now())
+  createdAt DateTime  @default(now())
   editedAt  DateTime?
   deletedAt DateTime?
 
@@ -117,6 +118,7 @@ model Message {
   @@index([spaceId, createdAt])
   @@index([senderId])
 }
+
 model Friend {
   profile1Id Int
   profile2Id Int
@@ -131,3 +133,4 @@ model Friend {
   @@id([profile1Id, profile2Id])
   @@index([status])
 }
+

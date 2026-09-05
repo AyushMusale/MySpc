@@ -1,0 +1,9 @@
+import '../repository/auth_repository.dart';
+
+class VerifyOtpUseCase {
+  const VerifyOtpUseCase(this._repository);
+  final AuthRepository _repository;
+
+  Future<bool> call({required String email, required String otp}) =>
+      _repository.verifyOtp(email: email, otp: otp);
+}

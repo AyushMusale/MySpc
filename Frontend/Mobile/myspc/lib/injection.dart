@@ -1,3 +1,4 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'data/network/auth_client.dart';
 import 'data/repo/auth_repository_impl.dart';
@@ -5,18 +6,28 @@ import 'domain/repository/auth_repository.dart';
 import 'domain/usecase/send_otp_usecase.dart';
 import 'domain/usecase/verify_otp_usecase.dart';
 import 'domain/usecase/signup_usecase.dart';
+import 'domain/usecase/login_usecase.dart';
 import 'presentation/auth/bloc/signup_bloc.dart';
+import 'presentation/auth/bloc/login_bloc.dart';
 
 final getIt = GetIt.instance;
 
 /// Call this once in [main] before [runApp].
 void setupDependencies() {
+  // ── Storage ──────────────────────────────────────────────────────────────
+  getIt.registerLazySingleton<FlutterSecureStorage>(
+    () => const FlutterSecureStorage(),
+  );
+
   // ── Network ──────────────────────────────────────────────────────────────
   getIt.registerLazySingleton<AuthClient>(() => AuthClient.instance);
 
   // ── Repositories ─────────────────────────────────────────────────────────
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(getIt<AuthClient>()),
+    () => AuthRepositoryImpl(
+      getIt<AuthClient>(),
+      getIt<FlutterSecureStorage>(),
+    ),
   );
 
   // ── Use cases ─────────────────────────────────────────────────────────────
@@ -29,6 +40,9 @@ void setupDependencies() {
   getIt.registerFactory<SignupUseCase>(
     () => SignupUseCase(getIt<AuthRepository>()),
   );
+  getIt.registerFactory<LoginUseCase>(
+    () => LoginUseCase(getIt<AuthRepository>()),
+  );
 
   // ── BLoCs (factory = new instance per route) ─────────────────────────────
   getIt.registerFactory<SignupBloc>(
@@ -38,4 +52,11 @@ void setupDependencies() {
       signupUseCase: getIt<SignupUseCase>(),
     ),
   );
+  getIt.registerFactory<LoginBloc>(
+    () => LoginBloc(
+      sendOtpUseCase: getIt<SendOtpUseCase>(),
+      loginUseCase: getIt<LoginUseCase>(),
+    ),
+  );
 }
+

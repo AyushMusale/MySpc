@@ -7,8 +7,8 @@ import '../../../bloc/signup_event.dart';
 import '../../../bloc/signup_state.dart';
 import '../../../widgets/auth_text_field.dart';
 import '../../../../common/widgets/primary_button.dart';
-import 'email_field_row.dart';
-import 'otp_field_widget.dart';
+import '../../../widgets/email_field_row.dart';
+import '../../../widgets/otp_field_widget.dart';
 
 /// The white rounded-top card containing the full signup form.
 /// Mirrors the Card + form structure from SignupForm.tsx.

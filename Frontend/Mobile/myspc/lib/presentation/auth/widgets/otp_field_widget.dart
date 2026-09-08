@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../widgets/auth_text_field.dart';
+import 'auth_text_field.dart';
 
 /// OTP input field with a hint message below.
-/// Mirrors the OTP Input in SignupForm.tsx.
+/// Mirrors the OTP Input in SignupForm.tsx and LoginForm.tsx.
 class OtpFieldWidget extends StatelessWidget {
   const OtpFieldWidget({
     super.key,

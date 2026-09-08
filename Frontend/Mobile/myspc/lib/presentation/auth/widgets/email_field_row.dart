@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors.dart';
 
 /// Email input + "Verify Email" outline button row.
-/// Mirrors the inline email row in SignupForm.tsx.
+/// Mirrors the inline email row in SignupForm.tsx and LoginForm.tsx.
 class EmailFieldRow extends StatelessWidget {
   const EmailFieldRow({
     super.key,
@@ -13,6 +13,7 @@ class EmailFieldRow extends StatelessWidget {
     this.focusNode,
     this.isLoading = false,
     this.isVerified = false,
+    this.buttonLabel = 'Verify Email',
   });
 
   final TextEditingController controller;
@@ -24,6 +25,7 @@ class EmailFieldRow extends StatelessWidget {
   final FocusNode? focusNode;
   final bool isLoading;
   final bool isVerified;
+  final String buttonLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +111,7 @@ class EmailFieldRow extends StatelessWidget {
                         ),
                       )
                     : Text(
-                        isVerified ? 'Sent ✓' : 'Verify Email',
+                        isVerified ? 'Sent ✓' : buttonLabel,
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,

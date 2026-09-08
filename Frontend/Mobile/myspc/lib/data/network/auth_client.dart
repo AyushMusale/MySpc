@@ -3,10 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../core/constants/app_constants.dart';
 import '../exception/api_exception.dart';
 
-/// Dio HTTP client — mirrors apiClient.ts
-/// - base URL, content-type, x-client-type header
-/// - response interceptor: throws [ApiException] when success == false
-/// - error interceptor: wraps DioException into [ApiException]
+
 class AuthClient {
   AuthClient._() : _dio = _buildDio();
 

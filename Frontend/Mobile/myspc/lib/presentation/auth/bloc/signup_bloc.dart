@@ -6,7 +6,6 @@ import '../../../domain/usecase/signup_usecase.dart';
 import 'signup_event.dart';
 import 'signup_state.dart';
 
-/// Mirrors the logic of authSlice.ts — sendOtp → verifyOtp → signup
 class SignupBloc extends Bloc<SignupEvent, SignupState> {
   SignupBloc({
     required SendOtpUseCase sendOtpUseCase,

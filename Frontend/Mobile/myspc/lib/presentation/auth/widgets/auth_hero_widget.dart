@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../core/theme/app_colors.dart';
-import '../../../../common/widgets/myspc_logo.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../common/widgets/myspc_logo.dart';
 
 /// The hero section at the top of the signup/login screens.
 ///

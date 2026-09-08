@@ -5,7 +5,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../bloc/signup_bloc.dart';
 import '../../bloc/signup_state.dart';
-import 'widgets/auth_hero_widget.dart';
+import '../../widgets/auth_hero_widget.dart';
 import 'widgets/signup_form_widget.dart';
 
 /// Full signup screen — hero section (top) + scrollable form card (bottom).

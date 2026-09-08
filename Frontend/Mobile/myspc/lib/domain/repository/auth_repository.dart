@@ -19,4 +19,11 @@ abstract class AuthRepository {
     required String email,
     required String otp,
   });
+
+  /// Logs in an existing user with [email] and [otp]. Returns their [ProfileEntity].
+  /// Throws [ApiException] on failure.
+  Future<ProfileEntity> login({
+    required String email,
+    required String otp,
+  });
 }

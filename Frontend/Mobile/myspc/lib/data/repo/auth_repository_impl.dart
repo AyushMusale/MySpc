@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../core/constants/app_constants.dart';
 import '../../domain/entity/profile_entity.dart';
 import '../../domain/repository/auth_repository.dart';
@@ -7,10 +8,11 @@ import '../model/signup_request.dart';
 import '../model/signup_response.dart';
 import '../network/auth_client.dart';
 
-/// Concrete implementation — calls the API via [AuthClient]
+/// Concrete implementation — calls the API via [AuthClient] and persists tokens in [FlutterSecureStorage]
 class AuthRepositoryImpl implements AuthRepository {
-  const AuthRepositoryImpl(this._client);
+  const AuthRepositoryImpl(this._client, this._storage);
   final AuthClient _client;
+  final FlutterSecureStorage _storage;
 
   @override
   Future<void> sendOtp(String email) async {
@@ -63,6 +65,62 @@ class AuthRepositoryImpl implements AuthRepository {
       if (data.profile == null) {
         throw const ApiException(message: 'No profile returned from server');
       }
+
+      // Store tokens securely
+      if (data.accessToken != null) {
+        await _storage.write(
+          key: AppConstants.accessTokenKey,
+          value: data.accessToken,
+        );
+      }
+      if (data.refreshToken != null) {
+        await _storage.write(
+          key: AppConstants.refreshTokenKey,
+          value: data.refreshToken,
+        );
+      }
+
+      final p = data.profile!;
+      return ProfileEntity(
+        userId: p.userId,
+        username: p.username,
+        displayName: p.displayName,
+        avatarUrl: p.avatarUrl,
+      );
+    } on DioException catch (e) {
+      throw e.apiException;
+    }
+  }
+
+  @override
+  Future<ProfileEntity> login({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await _client.dio.post<Map<String, dynamic>>(
+        AppConstants.loginEndpoint,
+        data: {'email': email, 'otp': otp},
+      );
+      final data = ApiResponse.fromJson(response.data!);
+      if (data.profile == null) {
+        throw const ApiException(message: 'No profile returned from server');
+      }
+
+      // Store tokens securely
+      if (data.accessToken != null) {
+        await _storage.write(
+          key: AppConstants.accessTokenKey,
+          value: data.accessToken,
+        );
+      }
+      if (data.refreshToken != null) {
+        await _storage.write(
+          key: AppConstants.refreshTokenKey,
+          value: data.refreshToken,
+        );
+      }
+
       final p = data.profile!;
       return ProfileEntity(
         userId: p.userId,

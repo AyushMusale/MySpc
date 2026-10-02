@@ -28,6 +28,16 @@ class LoginSubmitted extends LoginEvent {
   const LoginSubmitted();
 }
 
+/// Sets up a fresh bloc instance on the dedicated OTP verification route.
+class LoginOtpVerificationOpened extends LoginEvent {
+  const LoginOtpVerificationOpened(this.email);
+
+  final String email;
+
+  @override
+  List<Object?> get props => [email];
+}
+
 /// Resets the login form
 class LoginFormReset extends LoginEvent {
   const LoginFormReset();

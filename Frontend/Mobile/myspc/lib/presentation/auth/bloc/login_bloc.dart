@@ -15,11 +15,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginFieldChanged>(_onFieldChanged);
     on<LoginSendOtpRequested>(_onSendOtp);
     on<LoginSubmitted>(_onSubmit);
+    on<LoginOtpVerificationOpened>(_onOtpVerificationOpened);
     on<LoginFormReset>(_onReset);
   }
 
   final SendOtpUseCase _sendOtp;
   final LoginUseCase _login;
+
+  void _onOtpVerificationOpened(
+    LoginOtpVerificationOpened event,
+    Emitter<LoginState> emit,
+  ) {
+    emit(LoginState(email: event.email, otpSent: true, status: LoginStatus.otpSent));
+  }
 
   void _onFieldChanged(
     LoginFieldChanged event,

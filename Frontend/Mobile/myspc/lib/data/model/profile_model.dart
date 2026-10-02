@@ -12,7 +12,7 @@ class ProfileModel {
   final String? avatarUrl;
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
-        userId: json['userId'] as String,
+        userId: json['userId'].toString(),
         username: json['username'] as String,
         displayName: json['displayName'] as String,
         avatarUrl: json['avatarUrl'] as String?,

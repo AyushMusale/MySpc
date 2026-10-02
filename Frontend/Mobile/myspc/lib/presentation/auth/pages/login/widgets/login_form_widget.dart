@@ -59,10 +59,10 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   Widget build(BuildContext context) {
     return BlocConsumer<LoginBloc, LoginState>(
       listener: (context, state) {
-        if (state.status == LoginStatus.initial) {
-          _emailController.clear();
-          _otpController.clear();
-        }
+        // if (state.status == LoginStatus.initial) {
+        //   _emailController.clear();
+        //   _otpController.clear();
+        // }
       },
       builder: (context, state) {
         final screenSize = MediaQuery.sizeOf(context);

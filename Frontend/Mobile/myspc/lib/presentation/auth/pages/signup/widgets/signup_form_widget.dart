@@ -46,10 +46,7 @@ class _SignupFormWidgetState extends State<SignupFormWidget> {
   }
 
   void _handlePrimaryAction(BuildContext context, SignupState state) {
-    if (!state.otpSent) return; // shouldn't reach but guard
-    if (!state.otpVerified) {
-      context.read<SignupBloc>().add(const SignupVerifyOtpRequested());
-    } else {
+    if (state.otpSent && state.otp.trim().length == 6) {
       context.read<SignupBloc>().add(const SignupSubmitted());
     }
   }
@@ -57,10 +54,8 @@ class _SignupFormWidgetState extends State<SignupFormWidget> {
   String _primaryLabel(SignupState state) {
     if (state.isLoading) {
       if (!state.otpSent) return 'Sending OTP…';
-      if (!state.otpVerified) return 'Verifying OTP…';
       return 'Creating Account…';
     }
-    if (!state.otpVerified) return 'Verify OTP';
     return 'Create Account';
   }
 
@@ -69,12 +64,12 @@ class _SignupFormWidgetState extends State<SignupFormWidget> {
     return BlocConsumer<SignupBloc, SignupState>(
       listener: (context, state) {
         // Sync controllers from external state resets
-        if (state.status == SignupStatus.initial) {
-          _nameController.clear();
-          _usernameController.clear();
-          _emailController.clear();
-          _otpController.clear();
-        }
+        // if (state.status == SignupStatus.initial) {
+        //   _nameController.clear();
+        //   _usernameController.clear();
+        //   _emailController.clear();
+        //   _otpController.clear();
+        // }
       },
       builder: (context, state) {
         final screenSize = MediaQuery.sizeOf(context);
@@ -187,7 +182,7 @@ class _SignupFormWidgetState extends State<SignupFormWidget> {
                 OtpFieldWidget(
                   controller: _otpController,
                   focusNode: _otpFocus,
-                  enabled: state.otpSent,
+                  enabled: state.otpSent && !state.isLoading,
                   hint: state.otpSent
                       ? "We've sent a 6-digit code to your email."
                       : 'Verify your email to receive an OTP.',
@@ -229,8 +224,12 @@ class _SignupFormWidgetState extends State<SignupFormWidget> {
                 PrimaryButton(
                   label: _primaryLabel(state),
                   isLoading: state.isLoading,
-                  enabled: state.otpSent,
-                  onPressed: state.otpSent
+                  enabled: state.otpSent &&
+                      state.otp.trim().length == 6 &&
+                      !state.isLoading,
+                  onPressed: state.otpSent &&
+                          state.otp.trim().length == 6 &&
+                          !state.isLoading
                       ? () => _handlePrimaryAction(context, state)
                       : null,
                 ),

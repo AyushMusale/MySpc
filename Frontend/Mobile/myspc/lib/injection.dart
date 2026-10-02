@@ -1,10 +1,10 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'data/network/auth_client.dart';
+import 'data/local/profile_local_data_source.dart';
 import 'data/repo/auth_repository_impl.dart';
 import 'domain/repository/auth_repository.dart';
 import 'domain/usecase/send_otp_usecase.dart';
-import 'domain/usecase/verify_otp_usecase.dart';
 import 'domain/usecase/signup_usecase.dart';
 import 'domain/usecase/login_usecase.dart';
 import 'presentation/auth/bloc/signup_bloc.dart';
@@ -21,6 +21,9 @@ void setupDependencies() {
 
   // ── Network ──────────────────────────────────────────────────────────────
   getIt.registerLazySingleton<AuthClient>(() => AuthClient.instance);
+  getIt.registerLazySingleton<ProfileLocalDataSource>(
+    ProfileLocalDataSource.new,
+  );
 
   // ── Repositories ─────────────────────────────────────────────────────────
   getIt.registerLazySingleton<AuthRepository>(
@@ -34,9 +37,6 @@ void setupDependencies() {
   getIt.registerFactory<SendOtpUseCase>(
     () => SendOtpUseCase(getIt<AuthRepository>()),
   );
-  getIt.registerFactory<VerifyOtpUseCase>(
-    () => VerifyOtpUseCase(getIt<AuthRepository>()),
-  );
   getIt.registerFactory<SignupUseCase>(
     () => SignupUseCase(getIt<AuthRepository>()),
   );
@@ -48,8 +48,8 @@ void setupDependencies() {
   getIt.registerFactory<SignupBloc>(
     () => SignupBloc(
       sendOtpUseCase: getIt<SendOtpUseCase>(),
-      verifyOtpUseCase: getIt<VerifyOtpUseCase>(),
       signupUseCase: getIt<SignupUseCase>(),
+      profileLocalDataSource: getIt<ProfileLocalDataSource>(),
     ),
   );
   getIt.registerFactory<LoginBloc>(
@@ -59,4 +59,3 @@ void setupDependencies() {
     ),
   );
 }
-

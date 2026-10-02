@@ -17,10 +17,12 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<LoginBloc, LoginState>(
       listenWhen: (previous, current) =>
-          current.status == LoginStatus.success &&
-          previous.status != LoginStatus.success,
+          current.status == LoginStatus.otpSent &&
+              previous.status != LoginStatus.otpSent,
       listener: (context, state) {
-        context.go(AppConstants.homeRoute);
+        context.go(
+          '${AppConstants.loginVerifyRoute}?email=${Uri.encodeComponent(state.email)}',
+        );
       },
       child: Scaffold(
         backgroundColor: AppColors.cream,

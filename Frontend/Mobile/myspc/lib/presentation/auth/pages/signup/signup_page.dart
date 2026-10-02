@@ -26,6 +26,11 @@ class SignupPage extends StatelessWidget {
           current.status == SignupStatus.success &&
           previous.status != SignupStatus.success,
       listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Email verified and account created successfully.'),
+          ),
+        );
         context.go(AppConstants.homeRoute);
       },
       child: Scaffold(

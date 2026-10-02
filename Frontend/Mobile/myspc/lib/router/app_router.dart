@@ -7,6 +7,9 @@ import '../presentation/auth/bloc/signup_bloc.dart';
 import '../presentation/auth/bloc/login_bloc.dart';
 import '../presentation/auth/pages/signup/signup_page.dart';
 import '../presentation/auth/pages/login/login_page.dart';
+import '../presentation/auth/pages/login/login_verify_page.dart';
+import '../presentation/home/bloc/home_bloc.dart';
+import '../presentation/home/pages/home_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppConstants.signupRoute,
@@ -26,8 +29,20 @@ final appRouter = GoRouter(
       ),
     ),
     GoRoute(
+      path: AppConstants.loginVerifyRoute,
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<LoginBloc>(),
+        child: LoginVerifyPage(
+          email: state.uri.queryParameters['email'] ?? '',
+        ),
+      ),
+    ),
+    GoRoute(
       path: AppConstants.homeRoute,
-      builder: (context, state) => const _HomeStubPage(),
+      builder: (context, state) => BlocProvider(
+        create: (_) => HomeBloc(),
+        child: const HomePage(),
+      ),
     ),
   ],
 );

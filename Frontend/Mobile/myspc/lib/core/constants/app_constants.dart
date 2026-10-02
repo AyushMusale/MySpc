@@ -14,6 +14,7 @@ class AppConstants {
   // Routes
   static const String signupRoute = '/signup';
   static const String loginRoute = '/login';
+  static const String loginVerifyRoute = '/login/verify';
   static const String homeRoute = '/home';
 
   // Storage keys
